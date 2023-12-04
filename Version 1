@@ -1,0 +1,68 @@
+#include <Adafruit_CircuitPlayground.h>
+#include <FastLED.h>
+
+#define DATA_PIN A6
+#define NUM_EXTERNAL_LEDS 5
+#define MOTION_THRESHOLD 5.0
+
+CRGB externalLeds[NUM_EXTERNAL_LEDS];
+
+// Define WarmWhite
+#define WarmWhite CRGB(255, 245, 200)  // Adjust the values based on your preference
+
+void setup() {
+  CircuitPlayground.begin();
+  Serial.begin(115200);
+  delay(2000);
+
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(externalLeds, NUM_EXTERNAL_LEDS);
+}
+
+void loop() {
+  if (isFastMotionDetected()) {
+    // Fast-paced motion
+    randomTwinkle();
+  } else if (isNormalMotionDetected()) {
+    // Normal motion
+    fillSolidColor(WarmWhite);
+  } else {
+    // No motion
+    clearPixels();
+  }
+}
+
+bool isFastMotionDetected() {
+  return CircuitPlayground.motionZ() > MOTION_THRESHOLD || 
+         CircuitPlayground.motionY() > MOTION_THRESHOLD || 
+         CircuitPlayground.motionX() > MOTION_THRESHOLD;
+}
+
+bool isNormalMotionDetected() {
+  return CircuitPlayground.motionZ() > 0 || 
+         CircuitPlayground.motionY() > 0 || 
+         CircuitPlayground.motionX() > 0;
+}
+
+void fillSolidColor(CRGB color) {
+  fill_solid(externalLeds, NUM_EXTERNAL_LEDS, color);
+  FastLED.show();
+}
+
+void clearPixels() {
+  fillSolidColor(CRGB::Black);
+}
+
+void randomTwinkle() {
+  for (int i = 0; i < NUM_EXTERNAL_LEDS; i++) {
+    if (random(5) == 0) {
+      externalLeds[i] = CRGB(random(256), random(256), random(256));
+    }
+  }
+  FastLED.show();
+  // Use a timer instead of delay
+  static unsigned long lastMillis = 0;
+  if (millis() - lastMillis >= 50) {
+    lastMillis = millis();
+  }
+}
+
