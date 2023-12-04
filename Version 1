@@ -8,7 +8,7 @@
 CRGB externalLeds[NUM_EXTERNAL_LEDS];
 
 // Define WarmWhite
-#define WarmWhite CRGB(255, 245, 200)  // Adjust the values based on your preference
+#define WarmWhite CRGB(255, 245, 200)
 
 void setup() {
   CircuitPlayground.begin();
